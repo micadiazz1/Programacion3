@@ -17,18 +17,20 @@ public class GrafoDirigido<T> implements Grafo<T> {
     }
     @Override
     public void agregarVertice(int verticeId) {
-        this.vertices.put(verticeId,new HashSet());
+        if (!contieneVertice(verticeId))
+            this.vertices.put(verticeId,new HashSet());
     }
 
     @Override
     public void borrarVertice(int verticeId) {
-        this.vertices.remove(verticeId);
+        if (contieneVertice(verticeId))
+            this.vertices.remove(verticeId);
     }
 
     @Override
     public void agregarArco(int verticeId1, int verticeId2, T etiqueta) {
         //si contiene esos dos vertices
-        if(ContieneKeys( verticeId1, verticeId2)){
+        if(ContieneKeys(verticeId1, verticeId2)){
             //el arco al manipularse con HashSet se utiliza funcion add para agregar el arco
             this.vertices.get(verticeId1).add(new Arco<>(verticeId1,verticeId2,etiqueta));
         }
@@ -69,8 +71,9 @@ public class GrafoDirigido<T> implements Grafo<T> {
 
     @Override
     public boolean existeArco(int verticeId1, int verticeId2) {
-        Iterator<Arco<T>> arcos = this.vertices.get(verticeId1).iterator();
+
         if (ContieneKeys(verticeId1,verticeId2)){
+            Iterator<Arco<T>> arcos = this.vertices.get(verticeId1).iterator();
             while (arcos.hasNext()){
                 Arco<T> arco = arcos.next();
                 if (arco.getVerticeOrigen() == verticeId1 && arco.getVerticeDestino() == verticeId2){
@@ -83,14 +86,26 @@ public class GrafoDirigido<T> implements Grafo<T> {
 
     @Override
     public Arco<T> obtenerArco(int verticeId1, int verticeId2) {
+        /*
         Arco<T> arcoAux = null;
+
         if (existeArco(verticeId1, verticeId2)) {
             Iterator<Arco<T>> arcos = this.vertices.get(verticeId1).iterator();
             while (arcos.hasNext()) {
                 arcoAux = arcos.next();
+                return arcoAux;
             }
         }
-        return arcoAux;
+        return arcoAux; */
+        if (existeArco(verticeId1, verticeId2)) {
+            HashSet<Arco<T>> arcos = this.vertices.get(verticeId1);
+            for (Arco<T> arco : arcos) {
+                if (arco.getVerticeDestino() == verticeId2) {
+                    return arco;
+                }
+            }
+        }
+        return null; // Devolvemos null si no se encuentra el arco
     }
 
     @Override
@@ -102,6 +117,7 @@ public class GrafoDirigido<T> implements Grafo<T> {
     public int cantidadArcos() {
         int cant = 0;
         for (HashSet<Arco<T>> conjuntoArcos: vertices.values()) {
+            System.out.println(conjuntoArcos + " " );
             cant+= conjuntoArcos.size();
 
         }
@@ -110,7 +126,7 @@ public class GrafoDirigido<T> implements Grafo<T> {
 
     @Override
     public Iterator<Integer> obtenerVertices() {
-        //keySet una funcion nazi en el mapa ya me da de una el conjunto de todas las claves presentes del mapa
+        //keySet un metodo del mapa ya me da de una el conjunto de todas las claves presentes del mapa
         return this.vertices.keySet().iterator();
     }
 
@@ -129,7 +145,6 @@ public class GrafoDirigido<T> implements Grafo<T> {
 
     @Override
     public Iterator<Arco<T>> obtenerArcos() {
-
         Set<Integer> vertices = this.vertices.keySet();
         Set<Arco<T>> arcos = new HashSet<>();
         for (Integer vertice : vertices){
@@ -146,5 +161,11 @@ public class GrafoDirigido<T> implements Grafo<T> {
         }
         return null;
     }
+
+
+
+
+
+
 
 }
